@@ -6,7 +6,7 @@
 
 ### Посмотреть результат проверки можно здесь
 
-[SonarQube testapp](http://localhost:9000/dashboard?id=testapp)
+[SonarQube testapp](http://localhost:9000/dashboard?id=testapp) admin\testapp
 
 ### Скачиваем и отправляем в docker hub нашу проверенную сборку
 

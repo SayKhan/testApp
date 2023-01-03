@@ -22,6 +22,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ulimits:
+      nproc: 131072
+      nofile:
+        soft: 8192
+        hard: 131072
+
+  init:
+    image: bash
+    privileged: true
+    user: root
+    volumes:
+      - ./init.sh:/mnt/init.sh
+    command: ["sh", "-e", "/mnt/init.sh"]
 
   db:
     image: postgres:12

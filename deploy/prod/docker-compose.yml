@@ -1,0 +1,49 @@
+services:
+
+  testapp:
+    image: saykhan/testapp
+    depends_on:
+      db:
+        condition: service_healthy
+      fluent-bit:
+        condition: service_started
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: localhost:24224
+        tag: testapp.logs
+    restart: always
+
+  db:
+    image: postgres:14.1-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PW}
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    env_file: .env
+
+  fluent-bit:
+    image: fluent/fluent-bit
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./fluent-bit/parsers.conf:/fluent-bit/parsers/parsers.conf
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+
+volumes:
+  db:
+    driver: local
